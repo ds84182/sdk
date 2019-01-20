@@ -16,7 +16,10 @@
 #include "vm/simulator.h"
 
 #if !defined(TARGET_HOST_MISMATCH)
+// TODO: Check if we can remove this below
+#if !HOST_OS_CTR
 #include <sys/syscall.h> /* NOLINT */
+#endif
 #include <unistd.h>      /* NOLINT */
 #endif
 
@@ -91,12 +94,12 @@ DEFINE_FLAG(bool, sim_use_hardfp, true, "Use the hardfp ABI.");
 #endif
 
 void CPU::FlushICache(uword start, uword size) {
-#if HOST_OS_IOS
+#if HOST_OS_IOS || HOST_OS_CTR
   // Precompilation never patches code so there should be no I cache flushes.
   UNREACHABLE();
 #endif
 
-#if !defined(TARGET_HOST_MISMATCH) && HOST_ARCH_ARM && !HOST_OS_IOS
+#if !defined(TARGET_HOST_MISMATCH) && HOST_ARCH_ARM && !HOST_OS_IOS && !HOST_OS_CTR
   // Nothing to do. Flushing no instructions.
   if (size == 0) {
     return;

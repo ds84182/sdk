@@ -1,0 +1,32 @@
+# Copyright 2013 The Chromium Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//build/config/sysroot.gni")
+import("//build/toolchain/ccache.gni")
+import("//build/toolchain/gcc_toolchain.gni")
+
+if (use_ccache) {
+  compiler_prefix = "ccache "
+} else {
+  compiler_prefix = ""
+}
+
+devkit_arm = getenv("DEVKITARM")
+
+gcc_toolchain("ctr") {
+  prefix = "${devkit_arm}/bin/arm-none-eabi-"
+
+  cc = "${compiler_prefix}${prefix}gcc"
+  cxx = "${compiler_prefix}${prefix}g++"
+
+  ar = "${prefix}ar"
+  ld = cxx
+  readelf = "${prefix}readelf"
+  nm = "${prefix}nm"
+  strip = "${prefix}strip"
+
+  toolchain_cpu = "arm"
+  toolchain_os = "linux"
+  is_clang = false
+}

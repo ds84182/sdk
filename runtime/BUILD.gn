@@ -85,6 +85,8 @@ config("dart_os_config") {
       defines += [ "TARGET_OS_MACOS" ]
     } else if (target_os == "win") {
       defines += [ "TARGET_OS_WINDOWS" ]
+    } else if (target_os == "ctr") {
+      defines += [ "TARGET_OS_CTR", "_3DS", "_XOPEN_SOURCE=800", "__USE_ISOC99" ]
     } else {
       print("Unknown target_os: $target_os")
       assert(false)
@@ -163,11 +165,16 @@ config("dart_config") {
     }
   }
 
+  if (is_ctr) {
+    devkit_arm = getenv("DEVKITPRO")
+    include_dirs += [ "${devkit_arm}/libctru/include" ]
+  }
+
   if (!is_win) {
     cflags = [
       "-Werror",
       "-Wall",
-      "-Wextra",  # Also known as -W.
+      # "-Wextra",  # Also known as -W.
       "-Wno-unused-parameter",
       "-Wno-unused-private-field",
       "-Wnon-virtual-dtor",
@@ -181,6 +188,22 @@ config("dart_config") {
       "-fno-exceptions",
       "-Wimplicit-fallthrough",
     ]
+
+    if (is_ctr) {
+      cflags += [
+        "-Wno-error=cast-function-type",
+        "-Wno-error=stringop-truncation",
+        "-Wno-error=format=", # uint32_t is broken
+        "-Wno-error=clobbered",
+        "-Wno-error=type-limits",
+        "-march=armv6k",
+        "-mtune=mpcore",
+        "-mfloat-abi=hard",
+        "-mtp=soft",
+        "-mword-relocations",
+        "-ffunction-sections",
+      ]
+    }
 
     ldflags = []
     if (is_clang && dart_vm_code_coverage) {

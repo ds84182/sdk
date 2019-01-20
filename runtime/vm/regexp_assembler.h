@@ -124,11 +124,11 @@ class RegExpMacroAssembler : public ZoneAllocated {
   virtual void CheckAtStart(BlockLabel* on_at_start) = 0;
   // Dispatch after looking the current character up in a 2-bits-per-entry
   // map.  The destinations vector has up to 4 labels.
-  virtual void CheckCharacter(unsigned c, BlockLabel* on_equal) = 0;
+  virtual void CheckCharacter(uint32_t c, BlockLabel* on_equal) = 0;
   // Bitwise and the current character with the given constant and then
   // check for a match with c.
-  virtual void CheckCharacterAfterAnd(unsigned c,
-                                      unsigned and_with,
+  virtual void CheckCharacterAfterAnd(uint32_t c,
+                                      uint32_t and_with,
                                       BlockLabel* on_equal) = 0;
   virtual void CheckCharacterGT(uint16_t limit, BlockLabel* on_greater) = 0;
   virtual void CheckCharacterLT(uint16_t limit, BlockLabel* on_less) = 0;
@@ -146,9 +146,9 @@ class RegExpMacroAssembler : public ZoneAllocated {
   // fail to match then goto the on_failure label.  End of input always
   // matches.  If the label is NULL then we should pop a backtrack address off
   // the stack and go to that.
-  virtual void CheckNotCharacter(unsigned c, BlockLabel* on_not_equal) = 0;
-  virtual void CheckNotCharacterAfterAnd(unsigned c,
-                                         unsigned and_with,
+  virtual void CheckNotCharacter(uint32_t c, BlockLabel* on_not_equal) = 0;
+  virtual void CheckNotCharacterAfterAnd(uint32_t c,
+                                         uint32_t and_with,
                                          BlockLabel* on_not_equal) = 0;
   // Subtract a constant from the current character, then and with the given
   // constant and then check for a match with c.

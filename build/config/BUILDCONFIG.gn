@@ -153,6 +153,7 @@ declare_args() {
 if (current_os == "win") {
   is_android = false
   is_chromeos = false
+  is_ctr = false
   is_fuchsia = false
   is_ios = false
   is_linux = false
@@ -163,6 +164,7 @@ if (current_os == "win") {
 } else if (current_os == "mac") {
   is_android = false
   is_chromeos = false
+  is_ctr = false
   is_fuchsia = false
   is_ios = false
   is_linux = false
@@ -173,6 +175,7 @@ if (current_os == "win") {
 } else if (current_os == "android") {
   is_android = true
   is_chromeos = false
+  is_ctr = false
   is_fuchsia = false
   is_ios = false
   is_linux = false
@@ -183,9 +186,21 @@ if (current_os == "win") {
 } else if (current_os == "linux") {
   is_android = false
   is_chromeos = false
+  is_ctr = false
   is_fuchsia = false
   is_ios = false
   is_linux = true
+  is_mac = false
+  is_nacl = false
+  is_posix = true
+  is_win = false
+} else if (current_os == "ctr") {
+  is_android = false
+  is_chromeos = false
+  is_ctr = true
+  is_fuchsia = false
+  is_ios = false
+  is_linux = false
   is_mac = false
   is_nacl = false
   is_posix = true
@@ -378,6 +393,9 @@ if (is_win) {
 } else if (is_mac) {
   host_toolchain = "//build/toolchain/mac:clang_x64"
   set_default_toolchain(host_toolchain)
+} else if (is_ctr) {
+  host_toolchain = "//build/toolchain/linux:$host_cpu"
+  set_default_toolchain("//build/toolchain/ctr:ctr")
 }
 
 # ==============================================================================

@@ -3,7 +3,9 @@
 // BSD-style license that can be found in the LICENSE file.
 
 #include "platform/globals.h"
-#if defined(HOST_OS_ANDROID)
+#if HOST_OS_ANDROID || HOST_OS_CTR
+
+#include <string.h>
 
 #include "platform/utils.h"
 

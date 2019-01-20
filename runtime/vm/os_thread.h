@@ -27,6 +27,8 @@
 #include "vm/os_thread_macos.h"
 #elif defined(HOST_OS_WINDOWS)
 #include "vm/os_thread_win.h"
+#elif defined(HOST_OS_CTR)
+#include "vm/os_thread_ctr.h"
 #else
 #error Unknown target os.
 #endif

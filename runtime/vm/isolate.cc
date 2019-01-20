@@ -619,7 +619,7 @@ MessageHandler::MessageStatus IsolateMessageHandler::HandleMessage(
       }
     }
   } else {
-#ifndef PRODUCT
+#if defined(SUPPORT_TIMELINE) && !defined(PRODUCT)
     if (!Isolate::IsVMInternalIsolate(I)) {
       // Mark all the user isolates as white-listed for the simplified timeline
       // page of Observatory. The internal isolates will be filtered out from

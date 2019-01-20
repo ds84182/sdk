@@ -74,6 +74,8 @@ class AtomicOperations : public AllStatic {
 #include "platform/atomic_macos.h"
 #elif defined(HOST_OS_WINDOWS)
 #include "platform/atomic_win.h"
+#elif defined(HOST_OS_CTR)
+#include "platform/atomic_ctr.h"
 #else
 #error Unknown target os.
 #endif

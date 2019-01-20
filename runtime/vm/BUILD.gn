@@ -63,7 +63,7 @@ config("libdart_vm_config") {
 }
 
 library_for_all_configs("libdart_vm") {
-  target_type = "source_set"
+  target_type = "static_library"
   extra_deps = [ "//third_party/icu" ]
   if (is_fuchsia) {
     if (using_fuchsia_sdk) {
@@ -91,7 +91,7 @@ library_for_all_configs("libdart_vm") {
 }
 
 library_for_all_configs("libdart_lib") {
-  target_type = "source_set"
+  target_type = "static_library"
   if (is_fuchsia) {
     if (!using_fuchsia_sdk) {
       extra_deps = [

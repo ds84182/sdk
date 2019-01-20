@@ -54,18 +54,18 @@ class BytecodeRegExpMacroAssembler : public RegExpMacroAssembler {
                                     BlockLabel* on_end_of_input,
                                     bool check_bounds = true,
                                     intptr_t characters = 1);
-  virtual void CheckCharacter(unsigned c, BlockLabel* on_equal);
-  virtual void CheckCharacterAfterAnd(unsigned c,
-                                      unsigned mask,
+  virtual void CheckCharacter(uint32_t c, BlockLabel* on_equal);
+  virtual void CheckCharacterAfterAnd(uint32_t c,
+                                      uint32_t mask,
                                       BlockLabel* on_equal);
   virtual void CheckCharacterGT(uint16_t limit, BlockLabel* on_greater);
   virtual void CheckCharacterLT(uint16_t limit, BlockLabel* on_less);
   virtual void CheckGreedyLoop(BlockLabel* on_tos_equals_current_position);
   virtual void CheckAtStart(BlockLabel* on_at_start);
   virtual void CheckNotAtStart(intptr_t cp_offset, BlockLabel* on_not_at_start);
-  virtual void CheckNotCharacter(unsigned c, BlockLabel* on_not_equal);
-  virtual void CheckNotCharacterAfterAnd(unsigned c,
-                                         unsigned mask,
+  virtual void CheckNotCharacter(uint32_t c, BlockLabel* on_not_equal);
+  virtual void CheckNotCharacterAfterAnd(uint32_t c,
+                                         uint32_t mask,
                                          BlockLabel* on_not_equal);
   virtual void CheckNotCharacterAfterMinusAnd(uint16_t c,
                                               uint16_t minus,

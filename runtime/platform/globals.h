@@ -21,6 +21,16 @@
 #define __STDC_FORMAT_MACROS
 #endif
 
+// newlib fail?
+#ifdef _3DS
+/* Minimum and maximum values a `signed long long int' can hold.  */
+#   define LLONG_MAX	9223372036854775807LL
+#   define LLONG_MIN	(-LLONG_MAX - 1LL)
+
+/* Maximum value an `unsigned long long int' can hold.  (Minimum is 0.)  */
+#   define ULLONG_MAX	18446744073709551615ULL
+#endif
+
 #if defined(_WIN32)
 // Cut down on the amount of stuff that gets included via windows.h.
 #if !defined(WIN32_LEAN_AND_MEAN)
@@ -117,6 +127,9 @@
 
 #elif defined(__Fuchsia__)
 #define HOST_OS_FUCHSIA
+
+#elif defined(_3DS)
+#define HOST_OS_CTR 1
 
 #elif !defined(HOST_OS_FUCHSIA)
 #error Automatic target os detection failed.
@@ -406,6 +419,8 @@ typedef simd128_value_t fpu_register_t;
 #define TARGET_OS_MACOS 1
 #elif defined(HOST_OS_WINDOWS)
 #define TARGET_OS_WINDOWS 1
+#elif defined(HOST_OS_CTR)
+#define TARGET_OS_CTR 1
 #else
 #error Automatic target OS detection failed.
 #endif

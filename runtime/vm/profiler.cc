@@ -57,7 +57,7 @@ DEFINE_FLAG(bool,
             false,
             "Collect native stack traces when tracing Dart allocations.");
 
-#ifndef PRODUCT
+#ifdef SUPPORT_TIMELINE
 
 bool Profiler::initialized_ = false;
 SampleBuffer* Profiler::sample_buffer_ = NULL;

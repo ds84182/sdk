@@ -56,7 +56,7 @@ def BuildOptions():
       action='store_true')
   result.add_option("--os",
       help='Target OSs (comma-separated).',
-      metavar='[all,host,android]',
+      metavar='[all,host,android,ctr]',
       default='host')
   result.add_option("-v", "--verbose",
       help='Verbose output.',
@@ -90,11 +90,11 @@ def ProcessOptions(options, args):
       return False
   options.os = [ProcessOsOption(os_name) for os_name in options.os]
   for os_name in options.os:
-    if not os_name in ['android', 'freebsd', 'linux', 'macos', 'win32']:
+    if not os_name in ['android', 'freebsd', 'linux', 'macos', 'win32', 'ctr']:
       print ("Unknown os %s" % os_name)
       return False
     if os_name != HOST_OS:
-      if os_name != 'android':
+      if os_name != 'android' and os_name != 'ctr':
         print ("Unsupported target os %s" % os_name)
         return False
       if not HOST_OS in ['linux', 'macos']:

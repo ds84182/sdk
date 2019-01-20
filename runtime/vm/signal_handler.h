@@ -29,10 +29,12 @@ typedef struct ucontext {
 #include <signal.h>        // NOLINT
 #include <sys/ucontext.h>  // NOLINT
 #elif defined(HOST_OS_WINDOWS)
-// Stub out for windows.
+// Stub out for windows and n3ds.
 struct siginfo_t;
 struct mcontext_t;
 struct sigset_t {};
+#elif defined(HOST_OS_CTR)
+struct mcontext_t;
 #elif defined(HOST_OS_FUCHSIA)
 #include <signal.h>    // NOLINT
 #include <ucontext.h>  // NOLINT
