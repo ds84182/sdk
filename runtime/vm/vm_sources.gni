@@ -319,6 +319,7 @@ vm_sources = [
   "thread_interrupter.cc",
   "thread_interrupter.h",
   "thread_interrupter_android.cc",
+  "thread_interrupter_ctr.cc",
   "thread_interrupter_fuchsia.cc",
   "thread_interrupter_linux.cc",
   "thread_interrupter_macos.cc",

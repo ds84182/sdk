@@ -59,6 +59,12 @@
 // set up to fixup unaligned accesses. This can be verified by checking
 // /proc/cpu/alignment on modern Linux systems.
 
+#if HOST_OS_CTR
+extern "C" {
+  void Embedder_InvalidateInstructionCache(u32 addr, u32 size);
+}
+#endif
+
 namespace dart {
 
 #if defined(TARGET_ARCH_ARM_5TE)
@@ -94,12 +100,12 @@ DEFINE_FLAG(bool, sim_use_hardfp, true, "Use the hardfp ABI.");
 #endif
 
 void CPU::FlushICache(uword start, uword size) {
-#if HOST_OS_IOS || HOST_OS_CTR
+#if HOST_OS_IOS
   // Precompilation never patches code so there should be no I cache flushes.
   UNREACHABLE();
 #endif
 
-#if !defined(TARGET_HOST_MISMATCH) && HOST_ARCH_ARM && !HOST_OS_IOS && !HOST_OS_CTR
+#if !defined(TARGET_HOST_MISMATCH) && HOST_ARCH_ARM && !HOST_OS_IOS
   // Nothing to do. Flushing no instructions.
   if (size == 0) {
     return;
@@ -115,6 +121,8 @@ void CPU::FlushICache(uword start, uword size) {
   ::__clear_cache(beg, end);
 #elif defined(ANDROID)
   cacheflush(start, start + size, 0);
+#elif HOST_OS_CTR
+  Embedder_InvalidateInstructionCache(start, size);
 #else
 #error FlushICache only tested/supported on Linux and Android
 #endif
@@ -155,6 +163,24 @@ void HostCPUFeatures::Init() {
   integer_division_supported_ = FLAG_use_integer_division;
   neon_supported_ = FLAG_use_neon;
   hardfp_supported_ = false;
+#if defined(DEBUG)
+  initialized_ = true;
+#endif
+}
+#elif HOST_OS_CTR
+void HostCPUFeatures::Init() {
+  // TODO(24743): Actually check the CPU features and fail if we're missing
+  // something assumed in a precompiled snapshot.
+  hardware_ = "";
+  // When the VM is targetted to ARMv7, pretend that the CPU is ARMv7 even if
+  // the CPU is actually AArch64.
+  arm_version_ = ARMv6;
+  // Always assume we have floating point unit since we don't support ARMv6 in
+  // this path.
+  vfp_supported_ = FLAG_use_vfp;
+  integer_division_supported_ = FLAG_use_integer_division;
+  neon_supported_ = FLAG_use_neon;
+  hardfp_supported_ = true;
 #if defined(DEBUG)
   initialized_ = true;
 #endif

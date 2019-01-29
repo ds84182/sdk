@@ -1,7 +1,8 @@
 rm -rf ../ctr
 mkdir -p ../ctr/bin ../ctr/include ../ctr/lib
 
-CONFIG="precompiled_runtime_product"
+# CONFIG="precompiled_runtime_product"
+CONFIG="jit"
 
 OUT="out/ReleaseXARMV6"
 
@@ -9,7 +10,7 @@ LIBS="$OUT/obj/runtime/libdart_$CONFIG.a $OUT/obj/runtime/platform/libdart_platf
 
 # Build Dart
 
-./tools/build.py -m release -a armv6 -j8 libdart_precompiled_runtime_product
+./tools/build.py -m release -a armv6 -j8 libdart_$CONFIG
 
 cp -t ../ctr/lib $LIBS
 
@@ -18,6 +19,8 @@ cp -t ../ctr/lib $LIBS
 ninja -C out/ProductIA32 -v gen_snapshot
 
 cp -t ../ctr/bin out/ProductIA32/gen_snapshot
+
+# ./out/ReleaseIA32/gen_snapshot --snapshot_kind=core --vm_snapshot_data=../ctr/bin/jit_vm_snapshot_data.bin --isolate_snapshot_data=../ctr/bin/jit_isolate_snapshot_data.bin ./out/ReleaseXARMV6/vm_platform_strong.dill
 
 # Copy headers
 

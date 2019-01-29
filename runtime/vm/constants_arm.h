@@ -18,6 +18,9 @@ namespace arch_arm {
 // a time.
 #if defined(__ARM_ARCH_7A__)
 #define VFPv3_D32
+#elif defined(TARGET_OS_CTR)
+// Nintendo 3DS doesn't support all 32 registers.
+#define VFPv3_D16
 #elif defined(TARGET_ARCH_ARM) && !defined(HOST_ARCH_ARM)
 // If we're running in the simulator, use all 32.
 #define VFPv3_D32

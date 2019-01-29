@@ -15,8 +15,8 @@
 
 // An extra check since we are assuming the existence of /proc/cpuinfo below.
 #if !defined(USING_SIMULATOR) && !defined(__linux__) && !defined(ANDROID) &&   \
-    !HOST_OS_IOS
-#error ARM cross-compile only supported on Linux
+    !HOST_OS_IOS && !HOST_OS_CTR
+#error ARM cross-compile only supported on Linux and Nintendo 3DS
 #endif
 
 namespace dart {
@@ -2008,7 +2008,7 @@ int32_t Assembler::EncodeBranchOffset(int32_t offset, int32_t inst) {
   return (inst & ~kBranchOffsetMask) | offset;
 }
 
-int Assembler::DecodeBranchOffset(int32_t inst) {
+int32_t Assembler::DecodeBranchOffset(int32_t inst) {
   // Sign-extend, left-shift by 2, then add 8.
   return ((((inst & kBranchOffsetMask) << 8) >> 6) + Instr::kPCReadOffset);
 }

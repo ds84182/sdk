@@ -196,6 +196,8 @@ config("dart_config") {
         "-Wno-error=format=", # uint32_t is broken
         "-Wno-error=clobbered",
         "-Wno-error=type-limits",
+        "-Wno-error=class-memaccess",
+        "-Wno-error=implicit-fallthrough=",
         "-march=armv6k",
         "-mtune=mpcore",
         "-mfloat-abi=hard",

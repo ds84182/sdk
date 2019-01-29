@@ -85,6 +85,8 @@ class BitSet {
 
   void Reset() { memset(data_, 0, sizeof(data_)); }
 
+  void SetAll() { memset(data_, 255, sizeof(data_)); }
+
   intptr_t Size() const { return N; }
 
  private:

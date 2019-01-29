@@ -12,13 +12,17 @@
 #include "platform/assert.h"
 #include "platform/utils.h"
 
+#include "vm/bit_set.h"
 #include "vm/isolate.h"
 
 namespace dart {
 
 uword VirtualMemory::page_size_ = 0x1000;
 
+static Handle processHandle;
+
 void VirtualMemory::Init() {
+  svcDuplicateHandle(&processHandle, CUR_PROCESS_HANDLE);
 }
 
 static void unmap(void* address, intptr_t size) {
@@ -100,27 +104,42 @@ void VirtualMemory::Protect(void* address, intptr_t size, Protection mode) {
   ASSERT((thread == nullptr) || thread->IsMutatorThread() ||
          thread->isolate()->mutator_thread()->IsAtSafepoint());
 #endif
-  // uword start_address = reinterpret_cast<uword>(address);
-  // uword end_address = start_address + size;
-  // uword page_address = Utils::RoundDown(start_address, PageSize());
-  // int prot = 0;
-  // switch (mode) {
-  //   case kNoAccess:
-  //     prot = PROT_NONE;
-  //     break;
-  //   case kReadOnly:
-  //     prot = PROT_READ;
-  //     break;
-  //   case kReadWrite:
-  //     prot = PROT_READ | PROT_WRITE;
-  //     break;
-  //   case kReadExecute:
-  //     prot = PROT_READ | PROT_EXEC;
-  //     break;
-  //   case kReadWriteExecute:
-  //     prot = PROT_READ | PROT_WRITE | PROT_EXEC;
-  //     break;
-  // }
+  
+  uword start_address = reinterpret_cast<uword>(address);
+  uword page_address = Utils::RoundDown(start_address, PageSize());
+  uword end_address = Utils::RoundUp(start_address + size, PageSize());
+  int prot = 0;
+  // const char *protStr = "---";
+  switch (mode) {
+    case kNoAccess:
+      prot = 0;
+      break;
+    case kReadOnly:
+      prot = MEMPERM_READ;
+      // protStr = "r--";
+      break;
+    case kReadWrite:
+      prot = MEMPERM_READ | MEMPERM_WRITE;
+      // protStr = "rw-";
+      break;
+    case kReadExecute:
+      prot = MEMPERM_READ | MEMPERM_EXECUTE;
+      // protStr = "r-x";
+      break;
+    case kReadWriteExecute:
+      prot = MEMPERM_READ | MEMPERM_WRITE | MEMPERM_EXECUTE;
+      // protStr = "rwx";
+      break;
+  }
+  uword pages = (end_address-page_address) / 0x1000;
+  // printf("Reprotect [%08X - %08X] as %s (%d pages)\n", page_address, end_address, protStr, pages);
+  while (pages--) {
+    Result res = svcControlProcessMemory(processHandle, page_address, 0, 0x1000, MEMOP_PROT, prot);
+    if (res != 0) {
+      FATAL2("svcControlMemory error: %08lX (%s)", res, osStrError(res));
+    }
+    page_address += 0x1000;
+  }
   // if (mprotect(reinterpret_cast<void*>(page_address),
   //              end_address - page_address, prot) != 0) {
   //   int error = errno;

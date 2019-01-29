@@ -7,6 +7,7 @@
 #if defined(HOST_OS_CTR)
 
 #include "vm/os_thread.h"
+#include "dart_api.h"
 
 namespace dart {
 
@@ -93,7 +94,39 @@ intptr_t OSThread::GetMaxStackSize() {
   return kStackSize;
 }
 
+#ifndef RUN_HANDLER_ON_FAULTING_STACK
+
+/// Makes the exception handler reuse the stack of the faulting thread as-is
+#define RUN_HANDLER_ON_FAULTING_STACK   ((void*)1)
+
+/// Makes the exception handler push the exception data on its stack
+#define WRITE_DATA_TO_HANDLER_STACK     NULL
+
+/// Makes the exception handler push the exception data on the stack of the faulting thread
+#define WRITE_DATA_TO_FAULTING_STACK    ((ERRF_ExceptionData*)1)
+
+/// Exception handler type, necessarily an ARM function that does not return.
+typedef void (*ExceptionHandler)(ERRF_ExceptionInfo* excep, CpuRegisters* regs);
+
+static inline void threadOnException(ExceptionHandler handler, void* stack_top, ERRF_ExceptionData* exception_data)
+{
+	u8* tls = (u8*)getThreadLocalStorage();
+
+	*(u32*)(tls + 0x40) = (u32)handler;
+	*(u32*)(tls + 0x44) = (u32)stack_top;
+	*(u32*)(tls + 0x48) = (u32)exception_data;
+}
+
+#endif
+
+extern "C" void Embedder_HandleException(ERRF_ExceptionInfo* excep, CpuRegisters* regs);
+
 ThreadId OSThread::GetCurrentThreadId() {
+  threadOnException([](ERRF_ExceptionInfo* excep, CpuRegisters* regs) {
+    printf("\nException!\n");
+    Dart_DumpNativeStackTrace((void*)regs);
+    Embedder_HandleException(excep, regs);
+  }, RUN_HANDLER_ON_FAULTING_STACK, WRITE_DATA_TO_FAULTING_STACK);
   return threadGetCurrent();
 }
 
@@ -134,8 +167,34 @@ bool OSThread::Compare(ThreadId a, ThreadId b) {
   return a == b;
 }
 
+extern "C" {
+  extern u32 __ctru_heap;
+  extern u32 __stacksize__;
+}
+
 bool OSThread::GetCurrentStackBounds(uword* lower, uword* upper) {
-  return false; // TODO Implement
+  ::Thread current = threadGetCurrent();
+
+  if (current == nullptr) {
+    // Easy: Main thread, stack top is heap start, bottom is heap start + stack size
+    *lower = __ctru_heap;
+    *upper = __ctru_heap + __stacksize__;
+  } else {
+    // Difficult: Thread with heap allocated stack
+    // Steal tls_tp from TLS
+    u32 tls_tp = ((u32*)getThreadLocalStorage())[3];
+    *upper = tls_tp + 8;
+    // Then all we know is that the stack goes into the Thread struct
+    // Search the thread struct for a pointer to the top of the stack
+    // This offset + 4 is the lower bound of our stack
+    u32 *threadRaw = (u32*)current;
+    while (*(threadRaw++) != *upper);
+    *lower = (uword)threadRaw;
+  }
+
+  printf("Determined stack bounds: %p to %p\n", (void*)*lower, (void*)*upper);
+
+  return true;
 }
 
 #if defined(USING_SAFE_STACK)
@@ -261,6 +320,10 @@ Monitor::WaitResult Monitor::WaitMicros(int64_t micros) {
 #endif  // defined(DEBUG)
 
   Monitor::WaitResult retval = kNotified;
+  // TODO: With timeout
+  LightLock_Unlock(data_.mutex());
+  LightEvent_Wait(data_.event());
+  LightLock_Lock(data_.mutex());
   // if (micros == kNoTimeout) {
   //   // Wait forever.
   //   int result = pthread_cond_wait(data_.cond(), data_.mutex());

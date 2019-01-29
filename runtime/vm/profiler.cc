@@ -1101,6 +1101,12 @@ void Profiler::DumpStackTrace(void* context) {
 #error Unsupported architecture.
 #endif
   DumpStackTrace(sp, fp, pc, /*for_crash=*/true);
+#elif defined(HOST_OS_CTR)
+  CpuRegisters* regs = reinterpret_cast<CpuRegisters*>(context);
+  uword pc = regs->pc;
+  uword fp = regs->r[11];
+  uword sp = regs->sp;
+  DumpStackTrace(sp, fp, pc, /*for_crash=*/true);
 #else
 // TODO(fschneider): Add support for more platforms.
 // Do nothing on unsupported platforms.
@@ -1155,7 +1161,7 @@ void Profiler::DumpStackTrace(uword sp, uword fp, uword pc, bool for_crash) {
       &counters_, ILLEGAL_PORT, NULL, NULL, stack_lower, stack_upper, pc, fp,
       sp,
       /*skip_count=*/0,
-      /*try_symbolize_dart_frames=*/!for_crash);
+      /*try_symbolize_dart_frames=*/true);
   native_stack_walker.walk();
   OS::PrintErr("-- End of DumpStackTrace\n");
 }
