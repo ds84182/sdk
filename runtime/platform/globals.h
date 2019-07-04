@@ -404,7 +404,8 @@ typedef simd128_value_t fpu_register_t;
 
 #if !defined(TARGET_OS_ANDROID) && !defined(TARGET_OS_FUCHSIA) &&              \
     !defined(TARGET_OS_MACOS_IOS) && !defined(TARGET_OS_LINUX) &&              \
-    !defined(TARGET_OS_MACOS) && !defined(TARGET_OS_WINDOWS)
+    !defined(TARGET_OS_MACOS) && !defined(TARGET_OS_WINDOWS)  &&               \
+    !defined(TARGET_OS_CTR)
 // No target OS specified; pick the one matching the host OS.
 #if defined(HOST_OS_ANDROID)
 #define TARGET_OS_ANDROID 1

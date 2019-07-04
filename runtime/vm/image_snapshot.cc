@@ -714,7 +714,7 @@ void AssemblyImageWriter::WriteText(WriteStream* clustered_stream, bool vm) {
   FrameUnwindEpilogue();
 
 #if defined(TARGET_OS_LINUX) || defined(TARGET_OS_ANDROID) ||                  \
-    defined(TARGET_OS_FUCHSIA)
+    defined(TARGET_OS_FUCHSIA) || defined(TARGET_OS_CTR)
   assembly_stream_.Print(".section .rodata\n");
 #elif defined(TARGET_OS_MACOS) || defined(TARGET_OS_MACOS_IOS)
   assembly_stream_.Print(".const\n");

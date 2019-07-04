@@ -170,6 +170,29 @@ gen_vm_platform("vm_platform_stripped") {
   output_postfix = "_strong_stripped"
 }
 
+compile_platform("vm_platform_ctr") {
+  add_implicit_vm_platform_dependency = false
+
+  single_root_scheme = "org-dartlang-sdk"
+  single_root_base = rebase_path("../../")
+  libraries_specification_uri = "org-dartlang-sdk:///sdk/lib/libraries.json"
+
+  outputs = [
+    "$root_out_dir/vm_platform_ctr_strong.dill",
+    "$root_out_dir/vm_outline_ctr_strong.dill",
+  ]
+
+  args = [
+    "--target=flutter",
+    "--exclude-source",
+    "dart:core",
+  ]
+
+  if (dart_platform_bytecode) {
+    args += [ "--bytecode" ]
+  }
+}
+
 group("kernel_platform_files") {
   public_deps = [
     ":vm_legacy_platform",

@@ -173,7 +173,7 @@ void Dwarf::WriteAbbreviations() {
 #if defined(TARGET_OS_MACOS) || defined(TARGET_OS_MACOS_IOS)
     Print(".section __DWARF,__debug_abbrev,regular,debug\n");
 #elif defined(TARGET_OS_LINUX) || defined(TARGET_OS_ANDROID) ||                \
-    defined(TARGET_OS_FUCHSIA)
+    defined(TARGET_OS_FUCHSIA) || defined(TARGET_OS_CTR)
     Print(".section .debug_abbrev,\"\"\n");
 #else
     UNIMPLEMENTED();
@@ -258,7 +258,7 @@ void Dwarf::WriteCompilationUnit() {
 #if defined(TARGET_OS_MACOS) || defined(TARGET_OS_MACOS_IOS)
     Print(".section __DWARF,__debug_info,regular,debug\n");
 #elif defined(TARGET_OS_LINUX) || defined(TARGET_OS_ANDROID) ||                \
-    defined(TARGET_OS_FUCHSIA)
+    defined(TARGET_OS_FUCHSIA) || defined(TARGET_OS_CTR)
     Print(".section .debug_info,\"\"\n");
 #else
     UNIMPLEMENTED();
@@ -562,7 +562,7 @@ void Dwarf::WriteLines() {
 #if defined(TARGET_OS_MACOS) || defined(TARGET_OS_MACOS_IOS)
     Print(".section __DWARF,__debug_line,regular,debug\n");
 #elif defined(TARGET_OS_LINUX) || defined(TARGET_OS_ANDROID) ||                \
-    defined(TARGET_OS_FUCHSIA)
+    defined(TARGET_OS_FUCHSIA) || defined(TARGET_OS_CTR)
     Print(".section .debug_line,\"\"\n");
 #else
     UNIMPLEMENTED();
